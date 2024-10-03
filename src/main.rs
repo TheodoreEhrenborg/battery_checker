@@ -21,7 +21,7 @@ fn loop_and_watch() -> Result<()> {
     let re = Regex::new(r"([0-9]{1,3})%")?;
     let one_sec = std::time::Duration::from_secs(1);
     loop {
-        let foo = run_fun!(acpi - b)?;
+        let foo = run_fun!(acpi -b)?;
         let captures = re.captures(&foo).ok_or(anyhow!("regex failed"))?;
         let length = captures.len();
         if length != 2 {
