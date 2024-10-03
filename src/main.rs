@@ -30,10 +30,10 @@ fn loop_and_watch() -> Result<()> {
         let battery_int = captures[1].parse::<i32>()?;
         if battery_int < 30 {
             // Note this is in milliseconds
-            run_cmd!(notify-send -u critical -t 1000 "Battery level $battery_int")?;
+            run_cmd!(notify-send -u critical -t 9000 "Battery level $battery_int")?;
         }
         if battery_int < 40 && battery_int >= 30 {
-            run_cmd!(notify-send -t 1000 "Battery level $battery_int")?;
+            run_cmd!(notify-send -t 9000 "Battery level $battery_int")?;
         }
         std::thread::sleep(ten_seconds);
     }
