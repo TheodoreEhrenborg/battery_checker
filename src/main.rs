@@ -19,16 +19,15 @@ fn main() {
 
 fn loop_and_watch() -> Result<()> {
     let re = Regex::new(r"([0-9]{1,3})%")?;
-    let one_sec = std::time::Duration::from_secs(1);
+    let ten_seconds = std::time::Duration::from_secs(10);
     loop {
-        let foo = run_fun!(acpi -b)?;
-        let captures = re.captures(&foo).ok_or(anyhow!("regex failed"))?;
+        let acpi_output = run_fun!(acpi -b)?;
+        let captures = re.captures(&acpi_output).ok_or(anyhow!("regex failed"))?;
         let length = captures.len();
         if length != 2 {
-            bail!("len(captures) = {}", length);
+            bail!("len(captures) = {}, should be 2", length);
         }
-        let correct_capture = &captures[1];
-        let battery_int = correct_capture.parse::<i32>()?;
+        let battery_int = captures[1].parse::<i32>()?;
         if battery_int < 30 {
             // Note this is in milliseconds
             run_cmd!(notify-send -u critical -t 1000 "Battery level $battery_int")?;
@@ -36,6 +35,6 @@ fn loop_and_watch() -> Result<()> {
         if battery_int < 40 && battery_int >= 30 {
             run_cmd!(notify-send -t 1000 "Battery level $battery_int")?;
         }
-        std::thread::sleep(one_sec);
+        std::thread::sleep(ten_seconds);
     }
 }
