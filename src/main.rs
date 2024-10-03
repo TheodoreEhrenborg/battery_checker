@@ -38,5 +38,4 @@ fn loop_and_watch() -> Result<()> {
         }
         std::thread::sleep(one_sec);
     }
-    Ok(())
 }
