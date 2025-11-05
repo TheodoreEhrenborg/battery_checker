@@ -14,13 +14,17 @@ struct Args {
     /// Warning battery threshold (percentage)
     #[clap(short, long, default_value = "40")]
     warning_threshold: i32,
+
+    /// Upper battery threshold (percentage)
+    #[clap(short, long, default_value = "100")]
+    upper_threshold: i32,
 }
 
 fn main() {
     // Parse command line arguments
     let args = Args::parse();
 
-    match loop_and_watch(args.critical_threshold, args.warning_threshold) {
+    match loop_and_watch(args.critical_threshold, args.warning_threshold, args.upper_threshold) {
         Ok(_) => {
             println!("Shouldn't have gotten here");
             run_cmd!(notify-send -t 0 "battery checker: shouldn't have gotten here").unwrap()
@@ -32,7 +36,7 @@ fn main() {
     }
 }
 
-fn loop_and_watch(critical_threshold: i32, warning_threshold: i32) -> Result<()> {
+fn loop_and_watch(critical_threshold: i32, warning_threshold: i32, upper_threshold: i32) -> Result<()> {
     let re = Regex::new(r"([0-9]{1,3})%")?;
     let ten_seconds = std::time::Duration::from_secs(10);
     loop {
@@ -48,6 +52,9 @@ fn loop_and_watch(critical_threshold: i32, warning_threshold: i32) -> Result<()>
             run_cmd!(notify-send -u critical -t 9000 "Battery level $battery_int")?;
         }
         if battery_int < warning_threshold && battery_int >= critical_threshold {
+            run_cmd!(notify-send -t 9000 "Battery level $battery_int")?;
+        }
+        if battery_int > upper_threshold {
             run_cmd!(notify-send -t 9000 "Battery level $battery_int")?;
         }
         std::thread::sleep(ten_seconds);
